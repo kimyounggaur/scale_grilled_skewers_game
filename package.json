@@ -1,0 +1,37 @@
+{
+  "name": "scale-skewer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "next build",
+    "check": "tsc --noEmit && eslint src && vitest run",
+    "test": "vitest run",
+    "golden": "node --import tsx docs/reference/check-golden.mts src/game/index.ts",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "zustand": "latest",
+    "@radix-ui/react-dialog": "latest",
+    "@radix-ui/react-slot": "latest",
+    "lucide-react": "latest",
+    "clsx": "latest",
+    "tailwind-merge": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/node": "latest",
+    "vitest": "latest",
+    "tsx": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "@playwright/test": "latest",
+    "tailwindcss": "latest",
+    "@tailwindcss/postcss": "latest"
+  }
+}

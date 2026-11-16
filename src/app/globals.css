@@ -12,3 +12,87 @@
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}[data-motion=reduce] *,[data-motion=reduce] *:before,[data-motion=reduce] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 
 .order-actions>.name-options{display:flex;gap:10px;margin:0;align-items:stretch}.order-actions>.name-options>.button{min-height:44px}.order-actions .name-options .ss-note-label{flex-direction:row;gap:6px}
+
+/* Painted kitchen remaster: preserve the clear controls and the original game layout. */
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(110deg, rgba(255,249,236,.96), rgba(255,246,226,.88)), url('/assets/remaster/kitchen.webp');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+}
+.site-header { position: relative; z-index: 1; }
+.brand-mark {
+  background: linear-gradient(145deg, #f5a264, #d65538);
+  color: #fff8e5;
+  box-shadow: inset 0 1px 1px #fff8, 0 3px 0 #a14429;
+}
+.eyebrow { color: var(--coral-ink); }
+.button, .icon-button, .recipe-card, .order-choice { transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+.button:not(:disabled):hover, .icon-button:hover, .order-choice:not(:disabled):hover { transform: translateY(-2px); }
+.button:not(:disabled):active, .icon-button:active, .order-choice:not(:disabled):active { transform: translateY(1px); }
+.button.primary { background: linear-gradient(180deg, #dc6244, #b93924); color: #fff; box-shadow: inset 0 1px #ffcab0, 0 4px 0 #872c1e, 0 7px 14px #8a42282a; }
+.button.secondary, .icon-button { background: var(--surface); box-shadow: inset 0 1px #fff9, 0 3px 0 var(--line), 0 6px 14px #6c3c1e10; }
+.open-pill { box-shadow: 0 3px 12px #7a4b2020; }
+.hero-copy h1 { text-wrap: balance; }
+.hero-description { color: var(--ink-soft); }
+.stall-scene {
+  background: url('/assets/remaster/kitchen.webp') center 13% / cover no-repeat, #efcf9a;
+  border: 5px solid #fbefcf;
+  border-radius: 26px;
+  box-shadow: 0 0 0 1px #c69663, 0 12px 30px #804a2635, inset 0 0 30px #86491f20;
+  overflow: hidden;
+}
+.scene-sun, .stall-awning, .stall-feet { display: none; }
+.stall-sign { top: 12px; border-color: #744022; background: linear-gradient(165deg,#9e5c31,#70391f); box-shadow: inset 0 1px #e5b477, 0 4px 0 #512a1a, 0 6px 12px #4e2c2338; }
+.stall-back { top: 86px; height: 112px; border: 0; background: transparent; box-shadow: none; }
+.scene-chef { right: 12px; top: 0; }
+.scene-chef .ss-chef { width: 105px; height: 105px; filter: drop-shadow(0 3px 2px #5a361e35); }
+.hanging-card { top: 14px; padding: 9px; background: #fff8dd; box-shadow: 2px 3px 5px #6f432c33; }
+.scene-skewers { bottom: 2px; left: 8px; right: 8px; }
+.stall-counter { top: 193px; height: 59px; border-color: #94542f; background: repeating-linear-gradient(0deg,#c7844b 0,#d39458 14px,#b97140 16px); box-shadow: inset 0 2px #efbd87, 0 5px 8px #683d282f; }
+.stall-counter>b { margin-top: 24px; color: #fff4d9; text-shadow: 0 1px #754127; }
+.ingredient-bowls { top: -25px; }
+.recipe-card, .menu-guide, .order-ticket, .guide-bubble, .dialog-content, .order-choice { box-shadow: inset 0 1px #fff9, 0 5px 16px #794c2912; }
+.recipe-card { border-color: var(--line); background: var(--surface); box-shadow: inset 0 1px #fff9, 0 4px 0 var(--line), 0 8px 20px #75452c16; }
+.recipe-card:hover { box-shadow: inset 0 1px #fff9, 0 5px 0 var(--line), 0 12px 24px #75452c26; }
+.recipe-card.locked { opacity: .88; box-shadow: none; }
+.menu-guide { background: var(--card); }
+.order-ticket { border-top: 5px solid var(--wood); }
+.guide-panel > .ss-chef { filter: drop-shadow(0 3px 2px #713b2126); }
+.guide-bubble { border-color: var(--board-edge); }
+.dialog-content { box-shadow: inset 0 2px #fff9, 0 24px 80px #21151170; }
+@media (max-width: 700px) {
+  body { background-attachment: scroll; }
+  .stall-scene { max-width: 390px; }
+  .order-page { background: linear-gradient(180deg,#fff7e7d9,#fff5e6ed); }
+}
+@media (max-height: 700px) and (max-width: 899px) {
+  .stall-scene { height: 265px; margin-bottom: -35px; }
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme=light]) body { background-image: linear-gradient(#211511eb,#211511ee), url('/assets/remaster/kitchen.webp'); }
+  :root:not([data-theme=light]) .order-page { background: transparent; }
+}
+:root[data-theme=dark] body { background-image: linear-gradient(#211511eb,#211511ee), url('/assets/remaster/kitchen.webp'); }
+:root[data-theme=dark] .order-page { background: transparent; }
+@media (prefers-reduced-motion: reduce) {
+  .button, .icon-button, .recipe-card, .order-choice { transition: none; }
+}
+.button.primary:disabled { background: var(--line); color: var(--ink-soft); border-color: transparent; box-shadow: none; opacity: .75; }
+
+/* Supplied acrylic paintings become the shop sign and the main action controls. */
+.stall-sign {
+  background: transparent url('/assets/remaster/sign-wood.webp') center / 100% 100% no-repeat;
+  color: #48230f;
+  border: 0;
+  box-shadow: none;
+  text-shadow: 0 1px #f9d59b;
+}
+.button.primary:not(:disabled) {
+  color: #3a1d14;
+  background: transparent url('/assets/remaster/button-coral.webp') center / 100% 100% no-repeat;
+  border-color: transparent;
+  box-shadow: none;
+  text-shadow: 0 1px #ffd7c180;
+}

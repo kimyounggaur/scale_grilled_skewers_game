@@ -9,3 +9,16 @@
 @media(prefers-reduced-motion:reduce){.ss-slot,.ss-note,.ss-key,.ss-signature{animation:none!important;transition:none!important}}[data-motion="reduce"] .ss-slot,[data-motion="reduce"] .ss-note,[data-motion="reduce"] .ss-key,[data-motion="reduce"] .ss-signature{animation:none!important;transition:none!important}
 
 .ss-key.ss-white.ss-active,.ss-key.ss-white.ss-hint{z-index:0}
+
+/* Warm wood and ceramic surfaces around the interactive music notation. */
+.ss-skewer {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--board) 88%, #fff7d7), var(--board));
+  box-shadow: inset 0 2px #ffffff60, 0 5px 12px #6339141a;
+}
+.ss-stick { background: linear-gradient(180deg,#efd294,#a76c3c 50%,#7c492a); box-shadow: 0 1px 2px #683a1c33; }
+.ss-slot-box { box-shadow: inset 0 1px 4px #724a1c1f; }
+.ss-slot.ss-filled .ss-slot-box { box-shadow: inset 0 2px 4px #b38d5930; }
+.ss-tray { background: linear-gradient(150deg,#8f4e2c,var(--wood-deep)); box-shadow: inset 0 2px #e0a76d80, 0 5px 0 color-mix(in srgb,var(--wood-deep) 70%,transparent), 0 8px 15px #57301825; }
+.ss-key.ss-white { background: linear-gradient(180deg,var(--key-white),#f4e5c9); }
+.ss-key.ss-black { background: linear-gradient(135deg,#59413a,var(--key-black) 65%); }
+.ss-staff { box-shadow: inset 0 2px #fff7, 0 5px 14px #5d39131a; }

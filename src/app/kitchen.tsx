@@ -12,6 +12,8 @@ import { useOrderStore } from '../store/orderStore';
 import { cancelAudio, playSequence, playTone, setSound, unlockAudio } from '../audio/engine';
 import { formatMessage } from '../lib/strings';
 import { Chef, Ingredient, NoteLabel, Skewer, Staff, Tray } from '../components';
+import { Rulebook } from '../components/Rulebook';
+import '../components/rulebook.css';
 
 const KIND_LABEL: Record<OrderKind,string> = { learn:'배우기',challenge:'도전',fill:'빈자리 채우기',fix:'고쳐 굽기',name:'이름표 달기' };
 const KIND_DESC: Record<OrderKind,string> = { learn:'간격을 보며 차근차근 꽂아요',challenge:'혼자 완성하고 한 번에 구워요',fill:'비어 있는 재료를 채워요',fix:'어색한 재료 하나를 찾아 바꿔요',name:'같은 건반의 알맞은 이름을 골라요' };
@@ -21,7 +23,7 @@ function displayScale(id:string,n:Notation) { return n==='en'?scaleLabel(id,'en'
 function sigText(scale:Scale) { return scale.keySig.count ? `${scale.keySig.type==='sharp'?'♯':'♭'} ${scale.keySig.count}개` : '조표 없음'; }
 function StarRow({count}:{count:number}) { return <span className="stars" aria-label={`별 ${count}개`}>{[0,1,2].map(i=><span key={i} className={i<count?'earned':''}>★</span>)}</span>; }
 function IconButton({label,children,onClick}:{label:string;children:ReactNode;onClick:()=>void}) { return <button className="icon-button" aria-label={label} title={label} onClick={onClick}>{children}</button>; }
-function Modal({open,onOpenChange,title,children}:{open:boolean;onOpenChange:(v:boolean)=>void;title:string;children:ReactNode}) { return <Dialog.Root open={open} onOpenChange={onOpenChange}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className="dialog-content" aria-describedby={undefined}><div className="dialog-top"><Dialog.Title>{title}</Dialog.Title><Dialog.Close className="icon-button" aria-label="닫기"><X size={20}/></Dialog.Close></div>{children}</Dialog.Content></Dialog.Portal></Dialog.Root>; }
+function Modal({open,onOpenChange,title,children,className=''}:{open:boolean;onOpenChange:(v:boolean)=>void;title:string;children:ReactNode;className?:string}) { return <Dialog.Root open={open} onOpenChange={onOpenChange}><Dialog.Portal><Dialog.Overlay className="dialog-overlay"/><Dialog.Content className={`dialog-content ${className}`} aria-describedby={undefined}><div className="dialog-top"><Dialog.Title>{title}</Dialog.Title><Dialog.Close className="icon-button" aria-label="닫기"><X size={20}/></Dialog.Close></div>{children}</Dialog.Content></Dialog.Portal></Dialog.Root>; }
 
 export function KitchenApp({page}:{page:'home'|'menu'|'order'|'settings'|'compare'|'help'}) {
   const save=useSaveStore(s=>s.save), hydrated=useSaveStore(s=>s.hydrated);
@@ -37,10 +39,10 @@ export function KitchenApp({page}:{page:'home'|'menu'|'order'|'settings'|'compar
   },[save.settings]);
   useEffect(()=>()=>{cancelAudio();},[page]);
   if(!hydrated) return <main className="loading"><Chef/><p>주방을 준비하고 있어요…</p></main>;
-  const header = <header className="site-header"><Link href="/" className="brand"><span className="brand-mark"><Flame size={20}/></span><span>음계 꼬치구이<small>작은 음악 주방</small></span></Link><nav><IconButton label="도움말" onClick={()=>setHelpOpen(true)}><BookOpen size={20}/></IconButton><IconButton label="설정" onClick={()=>setSettingsOpen(true)}><Settings size={20}/></IconButton></nav></header>;
-  return <>{page!=='order'&&header}{page==='home'?<HomePage/>:page==='menu'?<MenuPage/>:page==='order'?<Suspense fallback={<main className="loading"><Chef/><p>주문을 준비해요…</p></main>}><OrderPage onSettings={()=>setSettingsOpen(true)}/></Suspense>:page==='settings'?<main className="content-page settings-page"><PageHeading eyebrow="MY KITCHEN" title="주방 설정"/><SettingsPanel/></main>:page==='compare'?<ComparePage/>:<main className="content-page"><HelpContent/></main>}
+  const header = <header className="site-header"><Link href="/" className="brand"><span className="brand-mark"><Flame size={20}/></span><span>음계 꼬치구이<small>작은 음악 주방</small></span></Link><nav><button className="rulebook-trigger" aria-label="게임 롤북" onClick={()=>setHelpOpen(true)}><BookOpen size={20}/><span>게임 롤북</span></button><IconButton label="설정" onClick={()=>setSettingsOpen(true)}><Settings size={20}/></IconButton></nav></header>;
+  return <>{page!=='order'&&header}{page==='home'?<HomePage/>:page==='menu'?<MenuPage/>:page==='order'?<Suspense fallback={<main className="loading"><Chef/><p>주문을 준비해요…</p></main>}><OrderPage onSettings={()=>setSettingsOpen(true)} onRulebook={()=>setHelpOpen(true)}/></Suspense>:page==='settings'?<main className="content-page settings-page"><PageHeading eyebrow="MY KITCHEN" title="주방 설정"/><SettingsPanel/></main>:page==='compare'?<ComparePage/>:<main className="content-page"><Rulebook/></main>}
     <Modal open={settingsOpen} onOpenChange={setSettingsOpen} title="주방 설정"><SettingsPanel/></Modal>
-    <Modal open={helpOpen} onOpenChange={setHelpOpen} title="작은 요리 안내서"><HelpContent/></Modal>
+    <Modal open={helpOpen} onOpenChange={setHelpOpen} title="게임 롤북" className="rulebook-dialog"><Rulebook/></Modal>
     {!useSaveStore.getState().storageAvailable&&<div className="storage-note" role="status">이 환경에서는 기록이 저장되지 않아요. 게임은 계속할 수 있어요.</div>}
   </>;
 }
@@ -73,7 +75,7 @@ function MenuPage() {
   </main>;
 }
 
-function OrderPage({onSettings}:{onSettings:()=>void}) {
+function OrderPage({onSettings,onRulebook}:{onSettings:()=>void;onRulebook:()=>void}) {
   const router=useRouter(),save=useSaveStore(s=>s.save),order=useOrderStore(s=>s.order);
   const query = useSearchParams().toString();
   const [config,setConfig]=useState<{scaleId:string;kind:OrderKind;intro:number;today:number}|null>(null);
@@ -172,7 +174,7 @@ function OrderPage({onSettings}:{onSettings:()=>void}) {
   function goNext(){if(config!.today>=0){try{const orders=JSON.parse(sessionStorage.getItem('skewer:today')??'[]') as {scaleId:string;kind:OrderKind}[];const next=orders[config!.today+1];if(next){router.push(`/order/?scale=${encodeURIComponent(next.scaleId)}&kind=${next.kind}&today=${config!.today+1}`);return;}}catch{}}router.push('/menu/');}
   const relativePcs=scale.mode==='minor'&&save.records[relativeOf(scale.id)]?.learned?buildScale(relativeOf(scale.id)).notes.slice(0,7).map(n=>n.pc):[];
   return <main className={`order-page ${order.phase==='baking'?'is-baking':''}`} data-testid="order-page">
-    <header className="order-ticket"><button className="icon-button" aria-label="메뉴판으로" onClick={()=>setExitOpen(true)}><ArrowLeft size={20}/></button><div className="ticket-copy"><span className="eyebrow">{config.intro?`처음 요리 · 주문 ${config.intro}`:KIND_LABEL[order.kind]}</span><h1>{displayScale(scale.id,settings.notation)}<span> 음계 꼬치 주세요!</span></h1></div><IconButton label={settings.sound?'소리 끄기':'소리 켜기'} onClick={()=>{useSaveStore.getState().updateSettings({sound:!settings.sound});void unlockAudio();}}>{settings.sound?<Volume2 size={20}/>:<VolumeX size={20}/>}</IconButton><IconButton label="설정" onClick={onSettings}><Settings size={20}/></IconButton></header>
+    <header className="order-ticket"><button className="icon-button" aria-label="메뉴판으로" onClick={()=>setExitOpen(true)}><ArrowLeft size={20}/></button><div className="ticket-copy"><span className="eyebrow">{config.intro?`처음 요리 · 주문 ${config.intro}`:KIND_LABEL[order.kind]}</span><h1>{displayScale(scale.id,settings.notation)}<span> 음계 꼬치 주세요!</span></h1></div><button className="rulebook-trigger order-rulebook-trigger" aria-label="게임 롤북" onClick={onRulebook}><BookOpen size={19}/><span>롤북</span></button><IconButton label={settings.sound?'소리 끄기':'소리 켜기'} onClick={()=>{useSaveStore.getState().updateSettings({sound:!settings.sound});void unlockAudio();}}>{settings.sound?<Volume2 size={20}/>:<VolumeX size={20}/>}</IconButton><IconButton label="설정" onClick={onSettings}><Settings size={20}/></IconButton></header>
     <div className="order-board"><div className="section-cap"><span>나의 음계 꼬치</span><span>{Math.min(order.slots.filter(s=>s.placement).length,8)} / 8</span></div><Skewer scale={scale} slots={order.slots} cursor={order.cursor} kind={order.kind} notation={settings.notation} solfege={settings.solfege} phase={order.phase} active={active} errorSlot={order.wrongSlot??-1} hiddenSlots={hiddenSlots} onSlot={i=>{const current=useOrderStore.getState().order;if(!current||current.phase==='baking')return;act(tapSlot(current,i));}}/></div>
     <section className="guide-panel"><Chef mood={order.phase==='served'?'happy':order.wrongSlot!==null?'wonder':'normal'}/><div className="guide-bubble" role="status" aria-live="polite" data-testid="guide"><p>{order.phase==='baking'?'치익! 음계를 들으며 노릇노릇 굽고 있어요.':message}</p>{order.phase==='served'&&<span className="completion-stars"><StarRow count={stars(save.records[scale.id]??emptyRecord(),scale)}/>{earned>0?`새로운 별 ${earned}개!`:'멋진 꼬치가 완성됐어요!'}</span>}</div></section>
     <section className="staff-panel"><div className="section-cap"><span>음악 레시피</span><span>{order.phase==='served'?'조표로 모였어요':'재료와 같은 음을 그려요'}</span></div><Staff scale={scale} slots={order.slots} kind={order.kind} phase={order.phase} active={active} errorSlot={order.wrongSlot??-1} hiddenSlots={hiddenSlots}/></section>
@@ -204,4 +206,3 @@ function SettingsPanel() {
     <Modal open={resetOpen} onOpenChange={setResetOpen} title="모든 별과 기록을 지울까요?"><p>학습 기록과 입문 완료 기록이 지워져요. 되돌릴 수 없어요.</p><div className="modal-actions"><button className="button secondary" onClick={()=>setResetOpen(false)}>취소</button><button className="button danger" onClick={()=>{useSaveStore.getState().resetRecords();setResetOpen(false);}}>모든 기록 지우기</button></div></Modal>
   </div>;
 }
-function HelpContent(){const c=buildScale('C'),am=buildScale('Am'),f=buildScale('F');return <div className="help-content"><p className="eyebrow">A RECIPE FOR EVERY NOTE</p><h2>재료로 음악을 배워요</h2><section><span className="help-number">01</span><h3>바로 옆은 반음, 두 칸은 온음</h3><div className="interval-illustration"><div><Ingredient pc={4}/><span>→</span><Ingredient pc={5}/><b>반음 · 바로 옆 건반</b></div><div><Ingredient pc={0}/><span>→</span><Ingredient pc={2}/><b>온음 · 건반 두 칸</b></div></div><p>검은건반도 한 칸으로 세요. 미–파와 시–도 사이에는 다른 건반이 없어요.</p></section><section><span className="help-number">02</span><h3>간격 순서가 음계의 레시피</h3><p>장음계는 온·온·반·온·온·온·반, 자연단음계는 온·반·온·온·반·온·온이에요.</p><Skewer scale={c} slots={filledSlots(c)} cursor={8} notation="en" solfege/><Skewer scale={am} slots={filledSlots(am)} cursor={8} notation="en" solfege/></section><section><span className="help-number">03</span><h3>변화표가 모이면 조표가 돼요</h3><Staff scale={f} slots={filledSlots(f)} phase="served"/><p>바장조는 나(B)를 반음 내려 내림나(B♭)를 써요. 굽고 나면 내림표가 악보 앞으로 모여 조표가 돼요.</p></section><section><span className="help-number">04</span><h3>요리사 별은 이렇게 받아요</h3><p>★ 배우기 완성<br/>★★ 도전을 한 번에 통과<br/>★★★ 빈자리·고쳐 굽기·이름표를 오답 없이 완성</p><p>힌트를 써도 배우기 별을 받을 수 있어요. 틀린 자리는 그 자리에서 고치면 돼요.</p></section></div>;}
